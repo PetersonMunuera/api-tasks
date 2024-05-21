@@ -9,7 +9,7 @@ export const routes = [
     path: '/tasks',
     handler: (req, res) => {
       const tasks = database.select('tasks')
-      
+
       return res.end(JSON.stringify(tasks))
     }
   },
@@ -17,20 +17,28 @@ export const routes = [
     method: 'POST',
     path: '/tasks',
     handler: (req, res) => {
-      const { title, description } = req.body
+      try {
+        const { title, description } = req.body
 
-      const task = {
-        id: randomUUID(),
-        title,
-        description,
-        completed_at: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        if (title && description) {
+          const task = {
+            id: randomUUID(),
+            title,
+            description,
+            completed_at: null,
+            created_at: new Date(),
+            updated_at: new Date(),
+          }
+
+          database.insert('tasks', task)
+
+          return res.writeHead(201).end()
+        } else {
+          throw new Error('title and description required')
+        }
+      } catch (error) {
+        return res.writeHead(400).end(error.message)
       }
-
-      database.insert('tasks', task)
-      
-      return res.writeHead(201).end()
     }
   },
 ]
