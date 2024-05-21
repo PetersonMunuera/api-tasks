@@ -43,6 +43,26 @@ export const routes = [
     }
   },
   {
+    method: 'PUT',
+    path: buildRoutePath('/tasks/:id'),
+    handler: (req, res) => {
+      try {
+        const { id } = req.params
+        const { title, description } = req.body
+
+        database.update('tasks', id, {
+          title, 
+          description,
+          updated_at: new Date(),
+        })
+        
+        return res.writeHead(200).end()
+      } catch (error) {
+        return res.writeHead(400).end(error.message)
+      }
+    }
+  },
+  {
     method: 'DELETE',
     path: buildRoutePath('/tasks/:id'),
     handler: (req, res) => {
@@ -50,7 +70,7 @@ export const routes = [
         const { id } = req.params
 
         database.delete('tasks', id)
-        return res.writeHead(200).end()
+        return res.writeHead(204).end()
       } catch (error) {
         return res.writeHead(400).end(error.message)
       }
