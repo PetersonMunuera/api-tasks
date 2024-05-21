@@ -73,6 +73,31 @@ export const routes = [
     }
   },
   {
+    method: 'PATCH',
+    path: buildRoutePath('/tasks/:id/complete'),
+    handler: (req, res) => {
+      try {
+        const { id } = req.params
+
+        const taskToUpdate = database.getById('tasks', id)
+
+        if (taskToUpdate) {
+
+          database.update('tasks', id, {
+            completed_at: taskToUpdate.completed_at ? null : new Date(),
+            updated_at: new Date(),
+          })
+
+          return res.writeHead(200).end()
+        } else {
+          throw new Error('id not found')
+        }
+      } catch (error) {
+        return res.writeHead(400).end(error.message)
+      }
+    }
+  },
+  {
     method: 'DELETE',
     path: buildRoutePath('/tasks/:id'),
     handler: (req, res) => {
@@ -86,7 +111,7 @@ export const routes = [
         } else {
           throw new Error('id not found')
         }
-        
+
         return res.writeHead(204).end()
       } catch (error) {
         return res.writeHead(400).end(error.message)
