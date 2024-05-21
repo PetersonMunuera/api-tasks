@@ -48,15 +48,25 @@ export const routes = [
     handler: (req, res) => {
       try {
         const { id } = req.params
-        const { title, description } = req.body
 
-        database.update('tasks', id, {
-          title, 
-          description,
-          updated_at: new Date(),
-        })
-        
-        return res.writeHead(200).end()
+        const taskToUpdate = database.getById('tasks', id)
+
+        if (taskToUpdate) {
+          const {
+            title = taskToUpdate.title,
+            description = taskToUpdate.description
+          } = req.body
+
+          database.update('tasks', id, {
+            title,
+            description,
+            updated_at: new Date(),
+          })
+
+          return res.writeHead(200).end()
+        } else {
+          throw new Error('id not found')
+        }
       } catch (error) {
         return res.writeHead(400).end(error.message)
       }
@@ -69,7 +79,14 @@ export const routes = [
       try {
         const { id } = req.params
 
-        database.delete('tasks', id)
+        const taskToDelete = database.getById('tasks', id)
+
+        if (taskToDelete) {
+          database.delete('tasks', id)
+        } else {
+          throw new Error('id not found')
+        }
+        
         return res.writeHead(204).end()
       } catch (error) {
         return res.writeHead(400).end(error.message)

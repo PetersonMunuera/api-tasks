@@ -19,6 +19,12 @@ export class Database {
     fs.writeFile(databasePath, JSON.stringify(this.#database))
   }
 
+  getById(table, id) {
+    let data = this.#database[table].find(row => row.id === id)
+
+    return data
+  }
+
   select(table) {
     let data = this.#database[table] ?? []
 
@@ -45,8 +51,6 @@ export class Database {
 
       this.#database[table][rowIndex] = { ...oldData, ...data }
       this.#persist()
-    } else {
-      throw new Error('id not found')
     }
   }
 
@@ -56,8 +60,6 @@ export class Database {
     if (rowIndex > -1) {
       this.#database[table].splice(rowIndex, 1)
       this.#persist()
-    } else {
-      throw new Error('id not found')
     }
   }
 }
